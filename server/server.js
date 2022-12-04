@@ -13,7 +13,7 @@ const routes = require('./routes');
 
 //express server
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 //apollo server
 const server = new ApolloServer({

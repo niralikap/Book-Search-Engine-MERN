@@ -5,7 +5,7 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 import { GET_ME } from '../utils/queries';
 import { REMOVE_BOOK } from '../utils/mutations';
 import Auth from '../utils/auth';
-import { removeBookId } from '../utils/localStorage';
+import { removeBookId, saveBookIds } from '../utils/localStorage';
 
 const SavedBooks = () => {
   const { loading, data } = useQuery(GET_ME);
@@ -51,6 +51,9 @@ const SavedBooks = () => {
     return <h2>LOADING...</h2>;
   }
 
+  const savedBookIds = userData.savedBooks.map(book => book.bookId);
+  saveBookIds(savedBookIds);
+  
   return (
     <>
       <Jumbotron fluid className='text-light bg-dark'>
