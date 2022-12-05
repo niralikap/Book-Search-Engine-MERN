@@ -1,49 +1,45 @@
 const express = require('express');
-const path = require('path');
-
-//import apollo server
 const { ApolloServer } = require('apollo-server-express');
-// import typeDefs and resolvers
-const { typeDefs, resolvers} = require('./schemas');
-const {authMiddleware} = require('./utils/auth');
+const path = require('path');
+const { authMiddleware } = require('./utils/auth');
 
-//db connection
+const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
-const routes = require('./routes');
 
-//express server
-const app = express();
 const PORT = process.env.PORT || 3001;
-
-//apollo server
+const app = express();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: authMiddleware
+  context: authMiddleware,
 });
 
-//apply apollo server with express ap
-server.applyMiddleware({app});
-
-//middleware parsing
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// if we're in production, serve client/build as static assets
+// Serve up static assets
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
 }
 
-app.use(routes);
-
-//get all
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/index.html'));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/'));
 });
 
-db.once('open', () => {
-  app.listen(PORT, () => {
-    console.log(`API server running on port ${PORT}!`);
-    console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`);
+// Create a new instance of an Apollo server with the GraphQL schema
+const startApolloServer = async (typeDefs, resolvers) => {
+  await server.start();
+  server.applyMiddleware({ app });
+
+  db.once('open', () => {
+    app.listen(PORT, () => {
+      console.log(`API server running on port ${PORT}!`);
+      console.log(
+        `Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`
+      );
+    });
   });
-}); 
+};
+
+// Call the async function to start the server
+startApolloServer(typeDefs, resolvers);
