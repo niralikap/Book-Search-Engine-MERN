@@ -7,10 +7,13 @@ import { REMOVE_BOOK } from '../utils/mutations';
 import Auth from '../utils/auth';
 import { removeBookId, saveBookIds } from '../utils/localStorage';
 
+
 const SavedBooks = () => {
   const { loading, data } = useQuery(GET_ME);
-  const [deleteBook] = useMutation(REMOVE_BOOK);
+  
   const userData = data?.me || {};
+
+  const [deleteBook] = useMutation(REMOVE_BOOK);
 
   if(!userData?.username) {
     return (
@@ -29,8 +32,8 @@ const SavedBooks = () => {
     }
 
     try {
-      await deleteBook({
-        variables: {bookId: bookId},
+      const response = await deleteBook({
+        variables: { bookId: bookId },
         update: cache => {
           const data = cache.readQuery({ query: GET_ME });
           const userDataCache = data.me;
@@ -40,6 +43,10 @@ const SavedBooks = () => {
           cache.writeQuery({ query: GET_ME , data: {data: {...data.me.savedBooks}}})
         }
       });
+
+      if (!response) {
+        throw new Error("Something went wrong!");
+      }
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
