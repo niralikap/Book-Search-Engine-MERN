@@ -56,6 +56,14 @@ In order to run the app, we need to run the following commands:
 - npm install @apollo/client graphql
 - npm install jwt-decode
 - npm install @apollo/react-hooks
+- npm run seed : This will seed the user database.
+- npm run develop : This will run the modules for both client and server and start the app.
+
+
+The app is successfully deployed to Heroku. The app link is:
+
+https://tranquil-headland-49059.herokuapp.com/
+
 
 ## Screenshots
 
